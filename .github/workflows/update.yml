@@ -3,8 +3,8 @@ name: 曼联中文赛程每日更新
 # 定时触发设置 [citation:5][citation:8]
 on:
   schedule:
-    # 每天凌晨2点（北京时间）运行，对应UTC时间18:00
-    - cron: '0 18 * * *'
+    # 每周一凌晨2点（北京时间）运行
+    - cron: '0 02 * * 1'
   # 也可以手动触发
   workflow_dispatch:
 
