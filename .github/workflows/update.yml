@@ -31,7 +31,7 @@ jobs:
       
       # 第四步：运行汉化脚本
       - name: 运行汉化脚本
-        run: python manutd_calendar.py
+        run: python ManchesterUnited_Calendar.py
       
       # 第五步：将生成的文件提交回仓库
       - name: 提交更新文件
