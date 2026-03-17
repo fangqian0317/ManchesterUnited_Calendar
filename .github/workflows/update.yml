@@ -1,0 +1,43 @@
+name: 曼联中文赛程每日更新
+
+# 定时触发设置 [citation:5][citation:8]
+on:
+  schedule:
+    # 每天凌晨2点（北京时间）运行，对应UTC时间18:00
+    - cron: '0 18 * * *'
+  # 也可以手动触发
+  workflow_dispatch:
+
+jobs:
+  update-calendar:
+    # 使用最新的Ubuntu系统 [citation:5]
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 第一步：下载仓库代码 [citation:5]
+      - name: 检出仓库代码
+        uses: actions/checkout@v3
+      
+      # 第二步：安装Python
+      - name: 设置Python环境
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      # 第三步：安装需要的Python库
+      - name: 安装依赖
+        run: |
+          pip install requests icalendar
+      
+      # 第四步：运行汉化脚本
+      - name: 运行汉化脚本
+        run: python manutd_calendar.py
+      
+      # 第五步：将生成的文件提交回仓库
+      - name: 提交更新文件
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add manutd_fixtures_chinese.ics
+          git diff --quiet && git diff --staged --quiet || git commit -m "自动更新中文赛程 $(date +'%Y-%m-%d')"
+          git push
