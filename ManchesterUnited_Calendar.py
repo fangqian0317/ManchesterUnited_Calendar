@@ -16,7 +16,7 @@ from typing import Dict, List, Set, Optional
 
 # ==================== 配置区域 ====================
 # 官方日历地址（请替换为您从官网复制的真实地址）
-OFFICAL_ICS_URL = "https://www.manutd.com/en/fixtures-calendar/mens.ics"
+OFFICAL_ICS_URL = "https://calendar.google.com/calendar/ical/ov0dk4m6dedaob7oqse4nrda4s%40group.calendar.google.com/public/basic.ics"
 OUTPUT_FILE = "manutd_fixtures_chinese.ics"
 CACHE_FILE = "translation_cache.json"  # 翻译缓存文件
 MAPPING_FILE = "translation_mapping.json"  # 映射表文件
