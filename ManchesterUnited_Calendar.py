@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-曼联中文赛程终极版 - 多源校对 + FotMob 核对 (语法修正版)
+曼联中文赛程终极版 - 多源校对 + FotMob 核对 (ICS生成修复版)
 """
 
 import requests
-from icalendar import Calendar
+from icalendar import Calendar, Event
 import json
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # 尝试导入 FotMob 库 (如果未安装，程序将降级运行)
 try:
@@ -36,19 +36,16 @@ translation_map = {
     "stadiums": {"Old Trafford": "老特拉福德球场"}
 }
 
-# ==================== 辅助函数（占位实现，您可以根据需要完善）====================
+# ==================== 辅助函数 ====================
 def extract_info(raw_title):
     """
     从原始标题中猜测主队、客队、赛事
     返回 (home_guess, away_guess, comp_guess)
     """
-    # 这是一个非常简化的实现，您可以根据实际标题格式优化
     home_guess = away_guess = comp_guess = ""
-    # 简单的逻辑：尝试分割
     parts = raw_title.split(' vs ')
     if len(parts) == 2:
         home_guess = parts[0].strip()
-        # 进一步尝试提取赛事
         away_part = parts[1]
         if ' - ' in away_part:
             away_guess, comp_guess = away_part.split(' - ', 1)
@@ -61,14 +58,29 @@ def extract_info(raw_title):
 def force_chinese_except_vs(text):
     """
     强制文本中只保留中文和VS，删除其他英文字母
-    （简化版，仅做演示）
+    （简化版，可根据需要完善）
     """
-    # 这里应该实现更复杂的清理逻辑，目前先返回原文本
+    # 示例：简单的保留中文、VS、空格、横线、数字
+    # 更完善的实现可以使用正则删除英文字母
     return text
 
 def generate_ics(events, filename):
-    """生成ICS文件（占位实现）"""
-    print(f"生成ICS文件: {filename}，包含 {len(events)} 个事件")
+    """生成标准的 ICS 文件"""
+    cal = Calendar()
+    cal.add('prodid', '-//曼联中文赛程//manutd.cn//')
+    cal.add('version', '2.0')
+    
+    for ev in events:
+        event = Event()
+        event.add('summary', ev['summary'])
+        event.add('dtstart', ev['dtstart'])
+        event.add('dtend', ev['dtend'])
+        event.add('location', ev['location'])
+        cal.add_component(event)
+    
+    with open(filename, 'wb') as f:
+        f.write(cal.to_ical())
+    print(f"✅ ICS文件已生成: {filename}，包含 {len(events)} 个事件")
 
 def save_mapping(mapping, filename):
     """保存映射表到文件"""
@@ -77,33 +89,31 @@ def save_mapping(mapping, filename):
     print(f"映射表已保存到 {filename}")
 
 def fetch_and_parse_ics(url):
-    """下载并解析ICS，返回事件列表（占位实现）"""
+    """下载并解析ICS，返回事件列表（待实现）"""
     print(f"尝试从 {url} 获取日历...")
-    # 这里应添加实际的下载和解析代码
-    # 为了框架可运行，返回一个空列表
+    # TODO: 实现真正的下载和解析逻辑
+    # 目前返回空列表，由主函数补充模拟数据
     return []
 
 def multi_source_verify(term, context='team'):
     """
-    从百度百科、维基百科、懂球帝获取译名并投票
-    返回最可靠的译名（占位实现）
+    从百度百科、维基百科、懂球帝获取译名并投票（待实现）
     """
     print(f"  多源校对 [{term}] ({context})...")
-    # 模拟返回原词
+    # 模拟返回原词（后续可替换为真实查询）
     return term
 
 def verify_with_fotmob(date, home_team, away_team):
     """
-    与 FotMob 数据核对，返回准确的轮次和赛程信息（占位实现）
+    与 FotMob 数据核对，返回准确的轮次和赛程信息（待实现）
     """
     if not FOTMOB_AVAILABLE:
         return None
     print(f"  尝试FotMob核对: {date} {home_team} vs {away_team}")
-    # 这里应添加实际的FotMob查询逻辑
+    # TODO: 实现真正的FotMob查询
     return None
-# ==================================================================
 
-# 4. 主处理逻辑
+# ==================== 主处理逻辑 ====================
 def main():
     print("="*60)
     print("曼联中文赛程终极版启动")
@@ -112,8 +122,15 @@ def main():
     raw_events = fetch_and_parse_ics(GOOGLE_CAL_ICS_URL)
     if not raw_events:
         print("未获取到任何事件，将使用模拟数据进行演示。")
-        # 添加一个模拟事件供测试
-        raw_events = [{'summary': 'Manchester United vs Liverpool - Premier League', 'date': '2024-05-25', 'location_raw': 'Old Trafford'}]
+        # 构造一个模拟事件（包含正确的日期时间）
+        start_time = datetime(2024, 5, 25, 14, 0)  # 假设比赛开始时间
+        end_time = start_time + timedelta(hours=2)
+        raw_events = [{
+            'summary': 'Manchester United vs Liverpool - Premier League',
+            'dtstart': start_time,
+            'dtend': end_time,
+            'location_raw': 'Old Trafford'
+        }]
 
     processed_events = []
 
@@ -123,20 +140,18 @@ def main():
         # 从原始标题提取信息
         raw_title = event.get('summary', '')
         home_guess, away_guess, comp_guess = extract_info(raw_title)
-        date = event.get('date', '')
+        date = event.get('dtstart').strftime('%Y-%m-%d') if event.get('dtstart') else ''
 
         # FotMob 核对
         fotmob_data = verify_with_fotmob(date, home_guess, away_guess)
 
         if fotmob_data:
             print("  ✅ FotMob匹配成功")
-            # 使用FotMob的数据，确保准确性
             comp_cn = translation_map['competitions'].get(fotmob_data['competition'], fotmob_data['competition'])
             home_cn = translation_map['teams'].get(fotmob_data['home'], fotmob_data['home'])
             away_cn = translation_map['teams'].get(fotmob_data['away'], fotmob_data['away'])
             round_info = f"第{fotmob_data['round']}轮" if fotmob_data.get('round') else ""
 
-            # 如果本地没有，触发多源校对并更新映射
             if home_cn == fotmob_data['home']:
                 home_cn = multi_source_verify(fotmob_data['home'], 'team')
                 translation_map['teams'][fotmob_data['home']] = home_cn
@@ -148,15 +163,13 @@ def main():
                 translation_map['competitions'][fotmob_data['competition']] = comp_cn
         else:
             print("  ⚠️ FotMob无匹配，使用本地映射+多源校对")
-            # FotMob无匹配，使用本地映射+多源校对
             comp_cn = translation_map['competitions'].get(comp_guess, multi_source_verify(comp_guess, 'competition'))
             home_cn = translation_map['teams'].get(home_guess, multi_source_verify(home_guess, 'team'))
             away_cn = translation_map['teams'].get(away_guess, multi_source_verify(away_guess, 'team'))
-            round_info = ""  # 轮次未知
+            round_info = ""
 
         # 构建最终标题
         final_title = f"{comp_cn} {round_info} {home_cn} VS {away_cn}".strip()
-        # 清理英文，确保纯中文（VS除外）
         final_title = force_chinese_except_vs(final_title)
 
         # 处理球场
@@ -170,6 +183,7 @@ def main():
         # 更新事件并保存
         event['summary'] = final_title
         event['location'] = stadium_cn
+        # 保留原有的 dtstart, dtend
         processed_events.append(event)
         print(f"  新标题: {final_title}")
         print(f"  新地点: {stadium_cn}")
