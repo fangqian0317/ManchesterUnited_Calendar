@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-曼联赛程智能汉化脚本 v6.0 - 多源校对 + API + 强制中文版
-- 优先使用 football-data.org API 获取比赛信息（含轮次）
-- API 失败时，调用多源校对（百度百科、维基百科）查询译名
-- 强制最终输出无英文（vs 除外）
-- 球场地址清理、球队简写、繁体转简体
+曼联赛程智能汉化脚本 v6.1 - 赛事翻译锁定 + API轮次修复
+- 赛事名称仅从本地映射，禁用多源查询，杜绝错误翻译
+- 强制“Friendly”译为“友谊赛”
+- 详细输出API返回数据，便于调试轮次
+- 球队和球场保留多源查询
 """
 
 import requests
@@ -30,11 +30,11 @@ MAPPING_FILE = "translation_mapping.json"
 CACHE_FILE = "translation_cache.json"
 CACHE_EXPIRY_DAYS = 30
 
-# football-data.org API 配置（请替换为您的真实密钥）
-FOOTBALL_DATA_API_KEY = "b82d8542ddb94bf0975928cba4f5e9c3"
+# football-data.org API 配置
+FOOTBALL_DATA_API_KEY = "b82d8542ddb94bf0975928cba4f5e9c3"  # 请确认此密钥有效
 FOOTBALL_DATA_API_URL = "https://api.football-data.org/v4/matches"
 
-# 球队ID映射（提高API匹配率）
+# 球队ID映射
 TEAM_IDS = {
     "Manchester United": 66,
     "Man Utd": 66,
@@ -44,11 +44,9 @@ TEAM_IDS = {
     "Tottenham": 73,
     "Manchester City": 65,
     "Real Madrid": 86,
-    # 可继续补充
 }
 
 # ==================== 本地翻译字典（基础）====================
-# 这些是初始种子数据，多源校对会动态扩充并保存到文件
 TEAM_MAP = {
     "Man Utd": "曼联", "Manchester United": "曼联", "Man United": "曼联",
     "Liverpool": "利物浦", "Chelsea": "切尔西", "Arsenal": "阿森纳",
@@ -164,15 +162,12 @@ COMP_MAP = {
     "Club Friendly": "友谊赛",
 }
 
-# ==================== 多源翻译获取器 ====================
+# ==================== 多源翻译获取器（仅用于球队和球场）====================
 class TranslationFetcher:
-    """从百度百科、维基百科获取中文译名"""
     def __init__(self):
         self.cache = self.load_cache()
         self.session = requests.Session()
-        self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        })
+        self.session.headers.update({'User-Agent': 'Mozilla/5.0'})
 
     def load_cache(self):
         if os.path.exists(CACHE_FILE):
@@ -208,13 +203,7 @@ class TranslationFetcher:
     def fetch_from_wikipedia(self, term):
         try:
             url = "https://zh.wikipedia.org/w/api.php"
-            params = {
-                'action': 'query',
-                'list': 'search',
-                'srsearch': term,
-                'format': 'json',
-                'srlimit': 1
-            }
+            params = {'action': 'query', 'list': 'search', 'srsearch': term, 'format': 'json', 'srlimit': 1}
             resp = self.session.get(url, params=params, timeout=5)
             data = resp.json()
             if data.get('query', {}).get('search'):
@@ -236,13 +225,9 @@ class TranslationFetcher:
         if not translation:
             translation = self.fetch_from_wikipedia(term)
         if not translation:
-            translation = term  # 保留原词
+            translation = term
 
-        self.cache[cache_key] = {
-            'translation': translation,
-            'term': term,
-            'timestamp': time.time()
-        }
+        self.cache[cache_key] = {'translation': translation, 'term': term, 'timestamp': time.time()}
         self.save_cache()
         return translation
 
@@ -280,12 +265,15 @@ def preprocess_title(title):
     return title.strip()
 
 def extract_competition(title):
-    """从标题中识别赛事名称"""
+    """从标题中识别赛事名称，仅使用本地COMP_MAP，禁止多源"""
     title_lower = title.lower()
+    # 精确匹配COMP_MAP中的键（包括大小写变体）
     for eng, chn in COMP_MAP.items():
         if eng.lower() in title_lower:
+            # 找到后，从标题中移除该部分（避免后续干扰球队提取）
+            # 但为了简单，我们只返回赛事名，剩余部分可能还需处理
             return chn, title
-    # 关键词匹配
+    # 关键词匹配（确保不会错误匹配）
     if 'friendly' in title_lower or '友谊' in title_lower:
         return "友谊赛", title
     if 'premier' in title_lower or '英超' in title_lower:
@@ -298,7 +286,7 @@ def extract_competition(title):
         return "足总杯", title
     if 'league cup' in title_lower or '联赛杯' in title_lower:
         return "联赛杯", title
-    return "友谊赛", title
+    return "友谊赛", title  # 默认
 
 def extract_teams(title):
     """从标题中提取主客队（假设标题已去除赛事部分）"""
@@ -313,21 +301,12 @@ def extract_teams(title):
             return home, away
     return "", ""
 
-def force_chinese(text):
-    """强制将文本中的英文单词替换（除了 vs）"""
-    # 简单实现：检查是否包含英文字母，如果有且不是 vs，则保留原样（由映射保证）
-    # 这里我们依赖前面的翻译步骤，不再额外处理
-    return text
-
 # ==================== 足球数据API客户端 ====================
 class FootballDataClient:
     def __init__(self, api_key):
         self.api_key = api_key
         self.session = requests.Session()
-        self.session.headers.update({
-            'X-Auth-Token': api_key,
-            'User-Agent': 'Mozilla/5.0'
-        })
+        self.session.headers.update({'X-Auth-Token': api_key, 'User-Agent': 'Mozilla/5.0'})
         self.cache_file = "api_cache.json"
         self.cache = self.load_cache()
 
@@ -363,6 +342,7 @@ class FootballDataClient:
             resp = self.session.get(FOOTBALL_DATA_API_URL, params=params, timeout=10)
             resp.raise_for_status()
             data = resp.json()
+            print(f"    API返回数据: {json.dumps(data, ensure_ascii=False)[:200]}...")  # 调试输出
             matches = data.get('matches', [])
             if len(matches) == 1:
                 match = matches[0]
@@ -400,10 +380,9 @@ class CalendarProcessor:
     def __init__(self, api_client, translator):
         self.api_client = api_client
         self.translator = translator
-        # 加载已有的映射文件（如果存在）
         self.team_map = self.load_mapping('teams', TEAM_MAP)
         self.stadium_map = self.load_mapping('stadiums', STADIUM_MAP)
-        self.comp_map = self.load_mapping('competitions', COMP_MAP)
+        self.comp_map = COMP_MAP.copy()  # 赛事名称不保存到文件，直接使用硬编码
 
     def load_mapping(self, key, default_dict):
         if os.path.exists(MAPPING_FILE):
@@ -420,26 +399,17 @@ class CalendarProcessor:
         mapping = {
             'teams': self.team_map,
             'stadiums': self.stadium_map,
-            'competitions': self.comp_map,
             'updated_at': datetime.now().isoformat()
         }
         with open(MAPPING_FILE, 'w', encoding='utf-8') as f:
             json.dump(mapping, f, ensure_ascii=False, indent=2)
-        print(f"已保存翻译映射到 {MAPPING_FILE}")
+        print(f"已保存球队和球场映射到 {MAPPING_FILE}")
 
     def translate_team(self, name):
-        """翻译球队，优先本地映射，否则多源查询"""
         if name in self.team_map:
             return self.team_map[name]
         translation = self.translator.get_translation(name, 'team')
         self.team_map[name] = translation
-        return translation
-
-    def translate_comp(self, name):
-        if name in self.comp_map:
-            return self.comp_map[name]
-        translation = self.translator.get_translation(name, 'competition')
-        self.comp_map[name] = translation
         return translation
 
     def translate_stadium(self, name):
@@ -480,9 +450,13 @@ class CalendarProcessor:
             away_raw = match_info['awayTeam']
             venue_raw = match_info.get('venue', '')
             matchday = match_info.get('matchday')
+            print(f"    API返回: 赛事={comp_raw}, 主队={home_raw}, 客队={away_raw}, 轮次={matchday}")
 
-            # 翻译
-            comp = self.translate_comp(comp_raw)
+            # 赛事名称仅从本地COMP_MAP翻译，禁止多源
+            comp = self.comp_map.get(comp_raw, comp_raw)
+            if comp not in self.comp_map.values():
+                # 如果没找到，尝试关键词匹配
+                comp, _ = extract_competition(comp_raw)
             home = self.translate_team(home_raw)
             away = self.translate_team(away_raw)
             venue = self.translate_stadium(venue_raw) if venue_raw else clean_location(event.get('LOCATION', ''))
@@ -496,15 +470,17 @@ class CalendarProcessor:
                 new_summary = f"{comp} - {home} vs {away}"
             new_location = venue
         else:
-            print("  ⚠️ API无匹配，使用本地+多源回退")
-            # 先识别赛事
+            print("  ⚠️ API无匹配，使用本地回退")
+            # 赛事识别（仅从本地映射）
             comp, remaining = extract_competition(orig_summary)
-            comp = self.translate_comp(comp)  # 确保赛事翻译
+            # 赛事名称确保在COMP_MAP中
+            if comp not in self.comp_map.values():
+                comp = "友谊赛"
+            print(f"  识别赛事: {comp}")
 
-            # 从剩余部分提取球队
+            # 提取球队
             home, away = extract_teams(remaining)
             if not home or not away:
-                # 尝试从原标题直接提取
                 home, away = extract_teams(orig_summary)
 
             if home:
@@ -515,21 +491,16 @@ class CalendarProcessor:
             away = clean_team_name(away)
 
             new_summary = f"{comp} - {home} vs {away}"
-            # 地点
             new_location = clean_location(event.get('LOCATION', ''))
 
         # 强制简体中文
         new_summary = to_simplified(new_summary)
         new_location = to_simplified(new_location)
 
-        # 最终检查：如果仍然包含英文单词（除了vs），尝试用本地映射再替换一次
-        # 简单检查是否有英文字母（排除vs）
+        # 最终清理：如果还有英文字母（除了vs），用本地映射再替换一次
         if re.search(r'[a-zA-Z]', new_summary.replace('vs', '')):
-            print("  警告：标题仍有英文，尝试二次清理")
-            # 二次替换：用本地映射覆盖
+            print("  二次清理英文")
             for eng, chn in self.team_map.items():
-                new_summary = new_summary.replace(eng, chn)
-            for eng, chn in self.comp_map.items():
                 new_summary = new_summary.replace(eng, chn)
             new_summary = to_simplified(new_summary)
 
@@ -559,7 +530,7 @@ def fetch_calendar():
 
 def main():
     print("="*70)
-    print("曼联中文赛程智能汉化系统 v6.0 - 多源校对 + API + 强制中文")
+    print("曼联中文赛程智能汉化系统 v6.1 - 赛事翻译锁定 + API轮次调试")
     print("="*70)
 
     if FOOTBALL_DATA_API_KEY == "YOUR_API_KEY_HERE":
