@@ -29,7 +29,7 @@ OUTPUT_FILE = "manutd_fixtures_chinese.ics"
 MAPPING_FILE = "translation_mapping.json"
 
 # football-data.org API 配置
-FOOTBALL_DATA_API_KEY = "YOUR_API_KEY_HERE"  # 🔑 请替换为您的真实API密钥
+FOOTBALL_DATA_API_KEY = "b82d8542ddb94bf0975928cba4f5e9c3"  # 请替换为您的真实API密钥
 FOOTBALL_DATA_API_URL = "https://api.football-data.org/v4/matches"
 
 # 球队ID映射（曼联固定ID为66，可从API查询或手动补充）
