@@ -50,47 +50,178 @@ TEAM_IDS = {
     # 可继续补充
 }
 
-# ==================== 本地翻译字典（持续扩充）====================
+# ==================== 本地翻译字典（扩充版）====================
 TEAM_MAP = {
+    # 曼联
     "Man Utd": "曼联", "Manchester United": "曼联",
-    "Liverpool": "利物浦", "Chelsea": "切尔西", "Arsenal": "阿森纳",
-    "Man City": "曼城", "Tottenham": "热刺", "Bournemouth": "伯恩茅斯",
-    "Leeds United": "利兹联", "Brentford": "布伦特福德", "Sunderland": "桑德兰",
-    "Nottingham Forest": "诺丁汉森林", "Brighton": "布莱顿", "Everton": "埃弗顿",
-    "Aston Villa": "阿斯顿维拉", "Newcastle United": "纽卡斯尔联", "Wolverhampton": "狼队",
-    "Crystal Palace": "水晶宫", "Fulham": "富勒姆", "West Ham United": "西汉姆联",
-    "Southampton": "南安普顿", "Leicester City": "莱斯特城",
-    # 国际球队
-    "Real Madrid": "皇家马德里", "Barcelona": "巴塞罗那", "Atletico Madrid": "马德里竞技",
-    "Bayern Munich": "拜仁慕尼黑", "Borussia Dortmund": "多特蒙德", "Bayer Leverkusen": "勒沃库森",
-    "Paris Saint-Germain": "巴黎圣日耳曼", "Lyon": "里昂", "Marseille": "马赛",
-    "Juventus": "尤文图斯", "AC Milan": "AC米兰", "Inter Milan": "国际米兰", "Roma": "罗马",
-    "Ajax": "阿贾克斯", "PSV": "埃因霍温", "Feyenoord": "费耶诺德",
-    "Celtic": "凯尔特人", "Rangers": "流浪者",
-    "Porto": "波尔图", "Benfica": "本菲卡", "Sporting CP": "葡萄牙体育",
-    "Shakhtar Donetsk": "顿涅茨克矿工", "Dynamo Kyiv": "基辅迪纳摩",
-    "Wrexham": "雷克瑟姆", "Real Betis": "皇家贝蒂斯", "Sevilla": "塞维利亚",
-    "Valencia": "巴伦西亚", "Villarreal": "比利亚雷亚尔", "Athletic Bilbao": "毕尔巴鄂竞技",
-    "Nice": "尼斯", "Monaco": "摩纳哥", "Lille": "里尔",
-    "Eintracht Frankfurt": "法兰克福", "RB Leipzig": "莱比锡红牛", "Wolfsburg": "沃尔夫斯堡",
-    "Napoli": "那不勒斯", "Lazio": "拉齐奥", "Atalanta": "亚特兰大",
+    # 英超球队（补充）
+    "Brentford": "布伦特福德",
+    "Brighton and Hove Albion": "布莱顿",  # 注意：Brighton 简称是“布莱顿”
+    "Brighton & Hove Albion": "布莱顿",
+    "Brighton": "布莱顿",
+    "Hull City": "赫尔城",
+    "Manchester City": "曼城",
+    "Man City": "曼城",
+    "Liverpool": "利物浦",
+    "Chelsea": "切尔西",
+    "Arsenal": "阿森纳",
+    "Tottenham Hotspur": "热刺",
+    "Tottenham": "热刺",
+    "Newcastle United": "纽卡斯尔联",
+    "Leicester City": "莱斯特城",
+    "Everton": "埃弗顿",
+    "Aston Villa": "阿斯顿维拉",
+    "Southampton": "南安普顿",
+    "Wolverhampton Wanderers": "狼队",
+    "Wolves": "狼队",
+    "Crystal Palace": "水晶宫",
+    "West Ham United": "西汉姆联",
+    "Fulham": "富勒姆",
+    "Leeds United": "利兹联",
+    "Nottingham Forest": "诺丁汉森林",
+    "Sunderland": "桑德兰",
+    "Bournemouth": "伯恩茅斯",
+    # 欧战球队
+    "Partizan Belgrade": "贝尔格莱德游击",
+    "CSKA Moscow": "莫斯科中央陆军",
+    "Real Madrid": "皇家马德里",
+    "Barcelona": "巴塞罗那",
+    "Bayern Munich": "拜仁慕尼黑",
+    "Borussia Dortmund": "多特蒙德",
+    "Paris Saint-Germain": "巴黎圣日耳曼",
+    "Juventus": "尤文图斯",
+    "AC Milan": "AC米兰",
+    "Inter Milan": "国际米兰",
+    "Ajax": "阿贾克斯",
+    "Celtic": "凯尔特人",
+    "Rangers": "流浪者",
+    "Porto": "波尔图",
+    "Benfica": "本菲卡",
+    "Shakhtar Donetsk": "顿涅茨克矿工",
+    "Dynamo Kyiv": "基辅迪纳摩",
+    # 其他常见球队
+    "Lyon": "里昂",
+    "Wrexham": "雷克瑟姆",
+    "Real Betis": "皇家贝蒂斯",
+    "Sevilla": "塞维利亚",
+    "Valencia": "巴伦西亚",
+    "Villarreal": "比利亚雷亚尔",
+    "Athletic Bilbao": "毕尔巴鄂竞技",
+    "Nice": "尼斯",
+    "Monaco": "摩纳哥",
+    "Marseille": "马赛",
+    "Lille": "里尔",
+    "Eintracht Frankfurt": "法兰克福",
+    "RB Leipzig": "莱比锡红牛",
+    "Wolfsburg": "沃尔夫斯堡",
+    "Napoli": "那不勒斯",
+    "Lazio": "拉齐奥",
+    "Atalanta": "亚特兰大",
+    "Roma": "罗马",
 }
-STADIUM_MAP = {
-    "Old Trafford": "老特拉福德球场", "Vitality Stadium": "活力球场", "Stamford Bridge": "斯坦福桥球场",
-    "Emirates Stadium": "酋长球场", "Etihad Stadium": "伊蒂哈德球场", "Anfield": "安菲尔德球场",
-    "Tottenham Hotspur Stadium": "托特纳姆热刺球场", "Stadium of Light": "光明球场",
-    "American Express Stadium": "美国运通社区球场", "Wembley Stadium": "温布利球场",
-    "Murrayfield Stadium": "默里菲尔德球场", "SoFi Stadium": "SoFi体育场", "Snapdragon Stadium": "骁龙体育场",
-    "Williams Brice Stadium": "威廉姆斯布莱斯体育场", "St. James' Park": "圣詹姆斯公园球场",
-    "MetLife Stadium": "大都会人寿体育场", "NRG Stadium": "NRG体育场", "Allegiant Stadium": "忠实体育场",
-    "Camp Nou": "诺坎普球场", "Santiago Bernabéu": "伯纳乌球场", "Allianz Arena": "安联球场",
-    "Parc des Princes": "王子公园球场", "Signal Iduna Park": "威斯特法伦球场", "San Siro": "圣西罗球场",
-}
+
 COMP_MAP = {
-    "Premier League": "英超", "FA Cup": "足总杯", "Carabao Cup": "联赛杯",
-    "UEFA Champions League": "欧冠", "UEFA Europa League": "欧联", "UEFA Conference League": "欧协联",
-    "Friendly": "友谊赛", "International Friendly": "友谊赛", "Club Friendly": "友谊赛",
-    "La Liga": "西甲", "Bundesliga": "德甲", "Serie A": "意甲", "Ligue 1": "法甲",
+    "Premier League": "英超",
+    "English Premier League": "英超",
+    "FA Cup": "足总杯",
+    "Carabao Cup": "联赛杯",
+    "English League Cup": "联赛杯",
+    "UEFA Champions League": "欧冠",
+    "Champions League": "欧冠",
+    "UEFA Europa League": "欧联",
+    "Europa League": "欧联",
+    "UEFA Conference League": "欧协联",
+    "Friendly": "友谊赛",
+    "International Friendly": "友谊赛",
+    "Club Friendly": "友谊赛",
+    "La Liga": "西甲",
+    "Bundesliga": "德甲",
+    "Serie A": "意甲",
+    "Ligue 1": "法甲",
+    "Eredivisie": "荷甲",
+    "Primeira Liga": "葡超",
+}
+
+STADIUM_MAP = {
+    "Old Trafford": "老特拉福德球场",
+    "Brentford Community Stadium": "布伦特福德社区球场",
+    "Amex Stadium": "美国运通社区球场",
+    "KCOM Stadium": "KC球场",
+    "Etihad Stadium": "伊蒂哈德球场",
+    "Anfield": "安菲尔德球场",
+    "Stamford Bridge": "斯坦福桥球场",
+    "Emirates Stadium": "酋长球场",
+    "Tottenham Hotspur Stadium": "托特纳姆热刺球场",
+    "Wembley Stadium": "温布利球场",
+    "St. James' Park": "圣詹姆斯公园球场",
+    "Villa Park": "维拉公园球场",
+    "Goodison Park": "古迪逊公园球场",
+    "Craven Cottage": "克拉文农场球场",
+    "King Power Stadium": "王权球场",
+    "St Mary's Stadium": "圣玛丽球场",
+    "Molineux Stadium": "莫利纽克斯球场",
+    "Selhurst Park": "塞尔赫斯特公园球场",
+    "London Stadium": "伦敦体育场",
+    "American Express Stadium": "美国运通社区球场",
+    "Vitality Stadium": "活力球场",
+    "Stadium of Light": "光明球场",
+    "City Ground": "城市球场",
+    "Bramall Lane": "布拉莫巷球场",
+    "Portman Road": "波特曼路球场",
+    "Carrow Road": "卡罗路球场",
+    "Turf Moor": "特夫摩尔球场",
+    "Kenilworth Road": "克尼尔沃思路球场",
+    "The Hawthorns": "山楂球场",
+    "St Andrew's": "圣安德鲁斯球场",
+    "Ewood Park": "埃伍德公园球场",
+    "Deepdale": "迪普戴尔球场",
+    "Fratton Park": "法顿公园球场",
+    "Home Park": "家园公园球场",
+    "Stadium MK": "MK球场",
+    "Prenton Park": "普伦顿公园球场",
+    "Blundell Park": "布伦德尔公园球场",
+    "Abbey Stadium": "修道院球场",
+    "Whaddon Road": "瓦顿路球场",
+    "The Recreation Ground": "娱乐场球场",
+    "The Shay": "谢伊球场",
+    "The Hive": "蜂巢球场",
+    "The Walks": "步行者球场",
+    "The Dripping Pan": "滴水盘球场",
+    "The Amex": "美国运通社区球场",
+    "The American Express Community Stadium": "美国运通社区球场",
+    "The Withdean Stadium": "威斯迪恩球场",
+    "The Goldstone Ground": "金石球场",
+    "The Priestfield Stadium": "普里斯特菲尔德球场",
+    "The MEMS Priestfield Stadium": "MEMS普里斯特菲尔德球场",
+    "The Gallagher Stadium": "加拉格尔球场",
+    "The Crabble Athletic Ground": "克拉布尔体育场",
+    "The Homelands": "家园球场",
+    "The Fullicks Stadium": "富利克斯球场",
+    "The South Kelsey Stadium": "南凯尔西球场",
+    "The Northolme": "诺索尔姆球场",
+    "The Marsh Lane": "沼泽巷球场",
+    "The JimGreenhalgh Stadium": "吉姆格林哈尔希球场",
+    "The Brian Addison Stadium": "布莱恩艾迪生球场",
+    "The Arriva Stadium": "阿里瓦球场",
+    "The Halton Stadium": "哈尔顿球场",
+    "The Deva Stadium": "德瓦球场",
+    "The Exacta Stadium": "埃克萨克塔球场",
+    "The B2net Stadium": "B2网络球场",
+    "The Proact Stadium": "普洛科特球场",
+    "The Keepmoat Stadium": "基普莫特球场",
+    "The Eco-Power Stadium": "生态动力球场",
+    "The Merseyrail Community Stadium": "默西铁路社区球场",
+    "The Haig Avenue": "黑格大道球场",
+    "The Victoria Road": "维多利亚路球场",
+    "The Chigwell Construction Stadium": "奇格韦尔建筑球场",
+    "The Mayesbrook Park": "梅斯布鲁克公园球场",
+    "The Oakside": "橡树边球场",
+    "The Millfield": "米尔菲尔德球场",
+    "The North Street": "北街球场",
+    "The Central Ground": "中央球场",
+    "The Queensgate": "皇后门球场",
+    "The 3G Pitch": "3G球场",
+    "The London Marathon Community Track": "伦敦马拉松社区跑道",
 }
 
 # ==================== 工具函数 ====================
@@ -241,41 +372,42 @@ class CalendarProcessor:
         else:
             print(f"  ⚠️ API无匹配，使用本地回退")
             # 回退：使用本地映射翻译
+            # 翻译球队
             home = home_guess
             away = away_guess
-            # 识别赛事类型：从标题中提取或猜测
+            # 赛事识别：从原始标题中提取，如果没有则默认为“友谊赛”
             comp = comp_guess
             if not comp:
                 # 尝试从标题中找关键词
                 lower = orig_summary.lower()
                 if 'friendly' in lower or '友谊' in lower:
-                    comp = "友谊赛"
+                    comp = "Friendly"
                 elif 'premier' in lower or '英超' in lower:
-                    comp = "英超"
+                    comp = "Premier League"
                 elif 'champions league' in lower or '欧冠' in lower:
-                    comp = "欧冠"
+                    comp = "Champions League"
+                elif 'europa league' in lower or '欧联' in lower:
+                    comp = "Europa League"
+                elif 'fa cup' in lower or '足总杯' in lower:
+                    comp = "FA Cup"
+                elif 'league cup' in lower or '联赛杯' in lower:
+                    comp = "League Cup"
                 else:
-                    comp = "友谊赛"  # 默认
-            # 翻译球队
+                    comp = "Friendly"
+            # 翻译球队（使用本地映射）
             if home:
+                # 先直接映射，如果没找到，保留原词
                 home = self.team_map.get(home, home)
             if away:
                 away = self.team_map.get(away, away)
+            # 清理球队名称（去除冗余后缀）
             home = clean_team_name(home)
             away = clean_team_name(away)
-            # 赛事翻译
+            # 翻译赛事
             comp = self.comp_map.get(comp, comp)
             new_summary = f"{comp} - {home} vs {away}"
             # 地点
             new_location = clean_location(event.get('LOCATION', ''))
-        
-        # 去除多余空格
-        new_summary = re.sub(r'\s+', ' ', new_summary).strip()
-        event['SUMMARY'] = new_summary
-        if 'LOCATION' in event:
-            event['LOCATION'] = new_location
-        if 'DESCRIPTION' in event:
-            event['DESCRIPTION'] = ""
         
         print(f"  新标题: {event['SUMMARY']}")
         print(f"  新地点: {new_location}")
