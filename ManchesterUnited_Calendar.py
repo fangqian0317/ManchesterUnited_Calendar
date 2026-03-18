@@ -324,6 +324,8 @@ class FootballDataClient:
             json.dump(self.cache, f, ensure_ascii=False, indent=2)
 
     def get_match_info(self, date, home_team, away_team):
+        """改进版：优先使用球队ID，若失败则从当天所有比赛中模糊匹配"""
+        # 尝试使用球队ID构建精确查询
         home_id = TEAM_IDS.get(home_team)
         away_id = TEAM_IDS.get(away_team)
         params = {'dateFrom': date, 'dateTo': date, 'status': 'SCHEDULED'}
@@ -339,10 +341,10 @@ class FootballDataClient:
                 return cached['data']
 
         try:
+            # 第一次请求：使用球队ID
             resp = self.session.get(FOOTBALL_DATA_API_URL, params=params, timeout=10)
             resp.raise_for_status()
             data = resp.json()
-            print(f"    API返回数据: {json.dumps(data, ensure_ascii=False)[:200]}...")  # 调试输出
             matches = data.get('matches', [])
             if len(matches) == 1:
                 match = matches[0]
@@ -357,9 +359,31 @@ class FootballDataClient:
                 self.save_cache()
                 return result
             elif len(matches) > 1:
+                # 如果有多个结果，尝试精确匹配球队名称
                 for match in matches:
-                    if (match['homeTeam']['name'].lower() == home_team.lower() and
-                        match['awayTeam']['name'].lower() == away_team.lower()):
+                    if (home_team.lower() in match['homeTeam']['name'].lower() and
+                        away_team.lower() in match['awayTeam']['name'].lower()):
+                        result = {
+                            'competition': match['competition']['name'],
+                            'matchday': match.get('matchday'),
+                            'venue': match.get('venue'),
+                            'homeTeam': match['homeTeam']['name'],
+                            'awayTeam': match['awayTeam']['name'],
+                        }
+                        self.cache[cache_key] = {'data': result, 'timestamp': time.time()}
+                        self.save_cache()
+                        return result
+
+            # 如果第一次请求失败（可能因为缺少ID），回退到无ID的全量查询，然后模糊匹配
+            if not home_id or not away_id:
+                params_no_id = {'dateFrom': date, 'dateTo': date, 'status': 'SCHEDULED'}
+                resp2 = self.session.get(FOOTBALL_DATA_API_URL, params=params_no_id, timeout=10)
+                resp2.raise_for_status()
+                data2 = resp2.json()
+                matches2 = data2.get('matches', [])
+                for match in matches2:
+                    if (home_team.lower() in match['homeTeam']['name'].lower() and
+                        away_team.lower() in match['awayTeam']['name'].lower()):
                         result = {
                             'competition': match['competition']['name'],
                             'matchday': match.get('matchday'),
