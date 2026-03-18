@@ -26,7 +26,7 @@ jobs:
       # 第三步：安装需要的Python库
       - name: 安装依赖
         run: |
-          pip install requests icalendar
+          pip install requests icalendar zhconv
       
       # 第四步：运行汉化脚本
       - name: 运行汉化脚本
